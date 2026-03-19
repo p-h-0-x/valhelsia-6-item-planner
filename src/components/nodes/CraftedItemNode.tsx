@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Handle, Position, type NodeProps } from '@xyflow/react'
 import { ItemIcon } from '../ItemIcon'
 import { CraftingGrid } from '../CraftingGrid'
+import { useMobileCraftingGrid } from '../CraftingGridContext'
+import { useIsMobile } from '../../hooks/useIsMobile'
 
 interface CraftedItemData {
   itemId: string
@@ -17,6 +19,8 @@ interface CraftedItemData {
 export function CraftedItemNode({ data }: NodeProps) {
   const { itemId, quantity, machine, recipeName, pattern, outputCount } = data as unknown as CraftedItemData
   const [showGrid, setShowGrid] = useState(false)
+  const isMobile = useIsMobile()
+  const mobileGrid = useMobileCraftingGrid()
   const mod = itemId.split(':')[0] ?? 'minecraft'
   const name = itemId.split(':')[1]?.replaceAll('_', ' ') ?? itemId
   const isShapeless = recipeName === 'minecraft:crafting_shapeless'
@@ -35,7 +39,14 @@ export function CraftedItemNode({ data }: NodeProps) {
         </div>
         {hasCraftingPattern && (
           <button
-            onClick={(e) => { e.stopPropagation(); setShowGrid(!showGrid) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              if (isMobile && mobileGrid && pattern) {
+                mobileGrid.openMobileGrid({ pattern, outputItemId: itemId, outputCount: outputCount ?? 1, isShapeless })
+              } else {
+                setShowGrid(!showGrid)
+              }
+            }}
             className="shrink-0 w-6 h-6 flex items-center justify-center rounded hover:bg-gray-600 transition-colors"
             title="View crafting pattern"
           >
