@@ -35,7 +35,7 @@ function scoreRecipe(recipe: Recipe): number {
     const outName = recipe.outputs[0].item.split(':')[1] ?? ''
     const inSuffix = inName.split('_').slice(-1)[0]
     const outSuffix = outName.split('_').slice(-1)[0]
-    if (inSuffix && outSuffix && inSuffix === outSuffix && inName !== outName) {
+    if (inSuffix && outSuffix && inSuffix === outSuffix && inName !== outName && !recipe.inputs[0].item.startsWith('#')) {
       score += 50
     }
   }
