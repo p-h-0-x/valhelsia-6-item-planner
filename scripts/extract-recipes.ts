@@ -104,6 +104,7 @@ interface NormalizedRecipe {
   machine: string
   inputs: NormalizedIngredient[]
   outputs: NormalizedIngredient[]
+  pattern?: (string | null)[][]
 }
 
 interface NormalizedItem {
@@ -120,6 +121,21 @@ function extractItemId(ingredient: unknown): string | null {
   if (Array.isArray(ingredient) && ingredient.length > 0)
     return extractItemId(ingredient[0])
   return null
+}
+
+function parseShapedPattern(recipe: Record<string, unknown>): (string | null)[][] | undefined {
+  const pattern = recipe.pattern as string[] | undefined
+  const key = recipe.key as Record<string, unknown> | undefined
+  if (!pattern || !key) return undefined
+
+  return pattern.map((row) =>
+    Array.from(row).map((ch) => {
+      if (ch === ' ') return null
+      const keyValue = key[ch]
+      if (!keyValue) return null
+      return extractItemId(keyValue)
+    })
+  )
 }
 
 function parseShapedIngredients(recipe: Record<string, unknown>): NormalizedIngredient[] {
@@ -154,6 +170,25 @@ function parseShapelessIngredients(recipe: Record<string, unknown>): NormalizedI
     if (itemId) counts.set(itemId, (counts.get(itemId) ?? 0) + 1)
   }
   return Array.from(counts).map(([item, count]) => ({ item, count }))
+}
+
+function parseShapelessPattern(recipe: Record<string, unknown>): (string | null)[][] | undefined {
+  const ingredients = recipe.ingredients as unknown[] | undefined
+  if (!ingredients) return undefined
+
+  const items: (string | null)[] = ingredients.map((ing) => extractItemId(ing))
+  const cols = Math.min(items.length, 3)
+  const rows = Math.ceil(items.length / 3)
+  const grid: (string | null)[][] = []
+  for (let r = 0; r < rows; r++) {
+    const row: (string | null)[] = []
+    for (let c = 0; c < cols; c++) {
+      const idx = r * 3 + c
+      row.push(idx < items.length ? items[idx] : null)
+    }
+    grid.push(row)
+  }
+  return grid
 }
 
 function parseResult(result: unknown): NormalizedIngredient | null {
@@ -256,13 +291,16 @@ function normalizeRecipe(recipeId: string, raw: Record<string, unknown>): Normal
 
   let inputs: NormalizedIngredient[]
   let outputs: NormalizedIngredient[]
+  let pattern: (string | null)[][] | undefined
 
   if (type === 'minecraft:crafting_shaped') {
     inputs = parseShapedIngredients(raw)
     outputs = parseGenericOutputs(raw)
+    pattern = parseShapedPattern(raw)
   } else if (type === 'minecraft:crafting_shapeless') {
     inputs = parseShapelessIngredients(raw)
     outputs = parseGenericOutputs(raw)
+    pattern = parseShapelessPattern(raw)
   } else if (type === 'minecraft:smithing_transform') {
     const base = extractItemId(raw.base)
     const addition = extractItemId(raw.addition)
@@ -281,7 +319,9 @@ function normalizeRecipe(recipeId: string, raw: Record<string, unknown>): Normal
 
   const machine = RECIPE_TYPE_TO_MACHINE[type] ?? type
 
-  return { id: recipeId, type, machine, inputs, outputs }
+  const result: NormalizedRecipe = { id: recipeId, type, machine, inputs, outputs }
+  if (pattern) result.pattern = pattern
+  return result
 }
 
 function itemIdToName(id: string): string {

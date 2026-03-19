@@ -35,6 +35,8 @@ export function treeToFlow(root: DependencyNode): FlowData {
         machine: node.machine,
         isRaw,
         recipeName: node.recipe?.type,
+        pattern: node.recipe?.pattern,
+        outputCount: node.recipe?.outputs.find((o) => o.item === node.itemId)?.count ?? 1,
         tagId: node.tagId,
         tagItems: node.tagItems,
       },

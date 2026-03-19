@@ -15,6 +15,7 @@ export interface Recipe {
   machine: string
   inputs: RecipeIngredient[]
   outputs: RecipeResult[]
+  pattern?: (string | null)[][]
 }
 
 export const RECIPE_TYPE_TO_MACHINE: Record<string, string> = {
