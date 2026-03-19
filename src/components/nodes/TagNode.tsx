@@ -24,12 +24,12 @@ export function TagNode({ data }: NodeProps) {
     ?.replaceAll('_', ' ') ?? tagId
 
   return (
-    <div className="bg-gray-800 border-2 border-cyan-500 rounded-lg min-w-[160px] shadow-lg">
+    <div className="bg-gray-800 border-2 border-cyan-500 rounded-lg min-w-[160px] shadow-lg cursor-pointer hover:bg-gray-700 transition-colors">
       <Handle type="target" position={Position.Top} className="!bg-cyan-500" />
 
       <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-700 rounded-t-lg"
+        onClick={(e) => { e.stopPropagation(); setExpanded(!expanded) }}
+        className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-600 rounded-t-lg"
       >
         <ItemIcon itemId={itemId} mod={mod} size={28} />
         <div className="flex-1 min-w-0">

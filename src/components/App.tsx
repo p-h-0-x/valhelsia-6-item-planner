@@ -42,6 +42,7 @@ export default function App() {
               itemId={selectedItem}
               data={data}
               onClose={() => setSelectedItem(null)}
+              onItemSelect={setSelectedItem}
             />
           ) : (
             <div className="flex items-center justify-center h-full text-gray-500">

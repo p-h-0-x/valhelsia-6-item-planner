@@ -16,7 +16,7 @@ export function CraftedItemNode({ data }: NodeProps) {
   const name = itemId.split(':')[1]?.replaceAll('_', ' ') ?? itemId
 
   return (
-    <div className="bg-gray-800 border-2 border-purple-500 rounded-lg px-3 py-2 min-w-[160px] shadow-lg">
+    <div className="bg-gray-800 border-2 border-purple-500 rounded-lg px-3 py-2 min-w-[160px] shadow-lg cursor-pointer hover:bg-gray-700 transition-colors">
       <Handle type="target" position={Position.Top} className="!bg-purple-500" />
       <div className="flex items-center gap-2">
         <ItemIcon itemId={itemId} mod={mod} size={28} />

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -9,6 +9,7 @@ import {
   useNodesState,
   useEdgesState,
   useReactFlow,
+  type Node,
   type NodeTypes,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
@@ -26,13 +27,24 @@ const nodeTypes: NodeTypes = {
 
 interface GraphViewProps {
   tree: DependencyNode
+  onItemSelect?: (itemId: string) => void
 }
 
-function GraphViewInner({ tree }: GraphViewProps) {
+function GraphViewInner({ tree, onItemSelect }: GraphViewProps) {
   const flowData = useMemo(() => treeToFlow(tree), [tree])
   const [nodes, setNodes, onNodesChange] = useNodesState(flowData.nodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(flowData.edges)
   const { fitView } = useReactFlow()
+
+  const handleNodeClick = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      const itemId = node.data.itemId as string | undefined
+      if (itemId && onItemSelect) {
+        onItemSelect(itemId)
+      }
+    },
+    [onItemSelect]
+  )
 
   useEffect(() => {
     setNodes(flowData.nodes)
@@ -46,6 +58,7 @@ function GraphViewInner({ tree }: GraphViewProps) {
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
+      onNodeClick={handleNodeClick}
       nodeTypes={nodeTypes}
       fitView
       minZoom={0.1}
@@ -64,11 +77,11 @@ function GraphViewInner({ tree }: GraphViewProps) {
   )
 }
 
-export function GraphView({ tree }: GraphViewProps) {
+export function GraphView({ tree, onItemSelect }: GraphViewProps) {
   return (
     <div className="w-full h-full">
       <ReactFlowProvider>
-        <GraphViewInner tree={tree} />
+        <GraphViewInner tree={tree} onItemSelect={onItemSelect} />
       </ReactFlowProvider>
     </div>
   )
