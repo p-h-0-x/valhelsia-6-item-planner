@@ -24,7 +24,7 @@ export function Sidebar({ result, data }: SidebarProps) {
   }))
 
   return (
-    <div className="w-72 bg-gray-900 border-l border-gray-700 overflow-y-auto p-4 flex flex-col gap-4">
+    <div className="w-full md:w-72 bg-gray-900 md:border-l border-gray-700 overflow-y-auto p-4 flex flex-col gap-4">
       <section>
         <h2 className="text-sm font-bold text-green-400 uppercase tracking-wide mb-2">
           Raw Materials ({rawMaterials.length})

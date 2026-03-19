@@ -27,8 +27,8 @@ export default function App() {
   return (
     <IconIndexProvider value={data.iconIndex}>
       <div className="flex flex-col h-screen">
-        <header className="flex items-center gap-4 px-6 py-3 bg-gray-900 border-b border-gray-700">
-          <h1 className="text-lg font-bold text-purple-400 whitespace-nowrap">
+        <header className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 px-3 md:px-6 py-2 md:py-3 bg-gray-900 border-b border-gray-700">
+          <h1 className="text-base md:text-lg font-bold text-purple-400 whitespace-nowrap">
             Valhelsia 6 Planner
           </h1>
           <SearchBar
