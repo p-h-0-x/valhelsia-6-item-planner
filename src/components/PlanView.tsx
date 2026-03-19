@@ -8,9 +8,10 @@ interface PlanViewProps {
   itemId: string
   data: AppData
   onClose: () => void
+  onItemSelect: (itemId: string) => void
 }
 
-export function PlanView({ itemId, data, onClose }: PlanViewProps) {
+export function PlanView({ itemId, data, onClose, onItemSelect }: PlanViewProps) {
   const result = useMemo(
     () => resolveItemDependencies(itemId, 1, data.recipesByOutput, data.tagMap),
     [itemId, data.recipesByOutput, data.tagMap]
@@ -34,7 +35,7 @@ export function PlanView({ itemId, data, onClose }: PlanViewProps) {
           <span className="text-xs text-gray-500">{itemId}</span>
         </div>
         <div className="flex-1">
-          <GraphView key={itemId} tree={result.tree} />
+          <GraphView key={itemId} tree={result.tree} onItemSelect={onItemSelect} />
         </div>
       </div>
       <Sidebar result={result} data={data} />
