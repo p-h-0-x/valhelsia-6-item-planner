@@ -47,10 +47,10 @@ export function CraftedItemNode({ data }: NodeProps) {
                 setShowGrid(!showGrid)
               }
             }}
-            className="shrink-0 w-6 h-6 flex items-center justify-center rounded hover:bg-gray-600 transition-colors"
+            className="shrink-0 w-8 h-8 md:w-6 md:h-6 flex items-center justify-center rounded bg-purple-500/20 md:bg-transparent hover:bg-gray-600 transition-colors"
             title="View crafting pattern"
           >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-purple-400">
+            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" className="text-purple-400">
               <rect x="0.5" y="0.5" width="3" height="3" rx="0.5" stroke="currentColor" />
               <rect x="5.5" y="0.5" width="3" height="3" rx="0.5" stroke="currentColor" />
               <rect x="10.5" y="0.5" width="3" height="3" rx="0.5" stroke="currentColor" />
