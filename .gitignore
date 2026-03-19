@@ -3,4 +3,5 @@ dist
 raw-data
 .extract-temp
 *.local
+*.tsbuildinfo
 .DS_Store
