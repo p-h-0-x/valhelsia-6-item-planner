@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react'
+import { useIsMobile } from '../hooks/useIsMobile'
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -31,6 +32,7 @@ interface GraphViewProps {
 }
 
 function GraphViewInner({ tree, onItemSelect }: GraphViewProps) {
+  const isMobile = useIsMobile()
   const flowData = useMemo(() => treeToFlow(tree), [tree])
   const [nodes, setNodes, onNodesChange] = useNodesState(flowData.nodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(flowData.edges)
@@ -65,13 +67,15 @@ function GraphViewInner({ tree, onItemSelect }: GraphViewProps) {
       maxZoom={2}
       defaultEdgeOptions={{ animated: true }}
     >
-      <Controls className="!bg-gray-800 !border-gray-600 !shadow-lg [&>button]:!bg-gray-700 [&>button]:!border-gray-600 [&>button]:!text-white [&>button:hover]:!bg-gray-600" />
-      <MiniMap
-        className="!bg-gray-800 !border-gray-600"
-        nodeColor={(n) =>
-          n.type === 'rawMaterial' ? '#22c55e' : n.type === 'tagItem' ? '#06b6d4' : '#8b5cf6'
-        }
-      />
+      <Controls className="!bg-gray-800 !border-gray-600 !shadow-lg [&>button]:!bg-gray-700 [&>button]:!border-gray-600 [&>button]:!text-white [&>button:hover]:!bg-gray-600 [&>button]:!w-10 [&>button]:!h-10 md:[&>button]:!w-8 md:[&>button]:!h-8" />
+      {!isMobile && (
+        <MiniMap
+          className="!bg-gray-800 !border-gray-600"
+          nodeColor={(n) =>
+            n.type === 'rawMaterial' ? '#22c55e' : n.type === 'tagItem' ? '#06b6d4' : '#8b5cf6'
+          }
+        />
+      )}
       <Background variant={BackgroundVariant.Dots} color="#374151" gap={20} />
     </ReactFlow>
   )

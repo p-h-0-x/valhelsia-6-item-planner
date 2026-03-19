@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import type { Item } from '../types/item'
 import { searchItems } from '../data/search-index'
 import { ItemIcon } from './ItemIcon'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 interface SearchBarProps {
   items: Item[]
@@ -9,6 +10,7 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ items, onSelect }: SearchBarProps) {
+  const isMobile = useIsMobile()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Item[]>([])
   const [open, setOpen] = useState(false)
@@ -66,7 +68,7 @@ export function SearchBar({ items, onSelect }: SearchBarProps) {
   }, [activeIndex])
 
   return (
-    <div className="relative flex-1 max-w-xl">
+    <div className="relative flex-1 md:max-w-xl">
       <input
         ref={inputRef}
         type="text"
@@ -75,7 +77,7 @@ export function SearchBar({ items, onSelect }: SearchBarProps) {
         onKeyDown={handleKeyDown}
         onFocus={() => results.length > 0 && setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 200)}
-        placeholder="Search items... (e.g. Iron Ingot, Mechanical Press)"
+        placeholder={isMobile ? "Search items..." : "Search items... (e.g. Iron Ingot, Mechanical Press)"}
         className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
       />
       {open && (
