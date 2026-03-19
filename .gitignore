@@ -1,0 +1,6 @@
+node_modules
+dist
+raw-data
+.extract-temp
+*.local
+.DS_Store

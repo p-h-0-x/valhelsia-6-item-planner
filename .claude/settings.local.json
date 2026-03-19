@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:*)",
+      "Bash(npm :*)",
+      "Bash(export PATH=\"/c/Program Files/nodejs:$PATH\")",
+      "Bash(npx tsx:*)",
+      "Bash(unzip *)",
+      "Bash(grep -v \"^$\")",
+      "Bash(unzip -p c:/Users/benja/curseforge/minecraft/*)",
+      "Bash(unzip -l c:/Users/benja/curseforge/minecraft/*)",
+      "Bash(node -e \":*)",
+      "Bash(python3 -c \":*)"
+    ]
+  }
+}
