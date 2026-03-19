@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { GraphView } from './GraphView'
 import { Sidebar } from './Sidebar'
+import { CraftingGrid } from './CraftingGrid'
+import { CraftingGridProvider, type CraftingGridData } from './CraftingGridContext'
 import { resolveItemDependencies } from '../graph/resolver'
 import type { AppData } from '../data/loader'
 
@@ -18,6 +20,11 @@ export function PlanView({ itemId, data, onClose, onItemSelect }: PlanViewProps)
   )
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [mobileGridData, setMobileGridData] = useState<CraftingGridData | null>(null)
+
+  const openMobileGrid = useCallback((data: CraftingGridData) => {
+    setMobileGridData(data)
+  }, [])
 
   const item = data.itemMap.get(itemId)
   const displayName =
@@ -43,7 +50,9 @@ export function PlanView({ itemId, data, onClose, onItemSelect }: PlanViewProps)
           </button>
         </div>
         <div className="flex-1">
-          <GraphView key={itemId} tree={result.tree} onItemSelect={onItemSelect} />
+          <CraftingGridProvider value={{ openMobileGrid }}>
+            <GraphView key={itemId} tree={result.tree} onItemSelect={onItemSelect} />
+          </CraftingGridProvider>
         </div>
       </div>
 
@@ -65,6 +74,30 @@ export function PlanView({ itemId, data, onClose, onItemSelect }: PlanViewProps)
             </button>
           </div>
           <Sidebar result={result} data={data} />
+        </div>
+      )}
+
+      {mobileGridData && (
+        <div className="md:hidden absolute bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 z-50 rounded-t-xl shadow-2xl animate-slideUp">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700">
+            <span className="text-sm font-bold text-purple-400 uppercase tracking-wide">
+              Crafting Pattern
+            </span>
+            <button
+              onClick={() => setMobileGridData(null)}
+              className="text-gray-400 hover:text-white text-lg px-2"
+            >
+              &times;
+            </button>
+          </div>
+          <div className="flex justify-center p-4">
+            <CraftingGrid
+              pattern={mobileGridData.pattern}
+              outputItemId={mobileGridData.outputItemId}
+              outputCount={mobileGridData.outputCount}
+              isShapeless={mobileGridData.isShapeless}
+            />
+          </div>
         </div>
       )}
     </div>
