@@ -5,9 +5,10 @@ import { ItemIcon } from './ItemIcon'
 interface SidebarProps {
   result: ResolutionResult
   data: AppData
+  onItemSelect?: (itemId: string) => void
 }
 
-export function Sidebar({ result, data }: SidebarProps) {
+export function Sidebar({ result, data, onItemSelect }: SidebarProps) {
   const rawMaterials = Array.from(result.rawMaterials.entries())
     .map(([id, qty]) => ({
       id,
@@ -53,15 +54,17 @@ export function Sidebar({ result, data }: SidebarProps) {
         </h2>
         <div className="flex flex-col gap-1">
           {machines.map((m) => (
-            <div
+            <button
               key={m.id}
-              className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-800"
+              type="button"
+              onClick={() => onItemSelect?.(m.id)}
+              className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-800 w-full text-left cursor-pointer"
             >
               <ItemIcon itemId={m.id} mod={m.mod} size={20} />
               <span className="text-sm text-gray-300 capitalize truncate">
                 {m.name}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       </section>
