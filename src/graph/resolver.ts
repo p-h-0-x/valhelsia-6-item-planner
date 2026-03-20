@@ -13,12 +13,15 @@ const CONVERSION_RECIPE_TYPES = new Set([
 function scoreRecipe(recipe: Recipe): number {
   let score = recipe.inputs.length
 
-  // Penalize storage block uncrafting (1 block → 9 items)
+  // Penalize storage block uncrafting (1 block → 9 items),
+  // but not ingot-to-nugget recipes which are legitimate crafting
+  const outputName = recipe.outputs[0]?.item.split(':')[1] ?? ''
   if (
     recipe.inputs.length === 1 &&
     recipe.outputs.length === 1 &&
     recipe.outputs[0].count === 9 &&
-    recipe.type === 'minecraft:crafting_shapeless'
+    recipe.type === 'minecraft:crafting_shapeless' &&
+    !outputName.endsWith('_nugget')
   ) {
     score += 100
   }
