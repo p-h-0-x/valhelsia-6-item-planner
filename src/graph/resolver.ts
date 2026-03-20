@@ -1,24 +1,34 @@
 import type { Recipe } from '../types/recipe'
 import type { DependencyNode, ResolutionResult } from './types'
 
-// Recipe types that convert between variants of the same item category
+// Recipe types that ALWAYS convert between variants of the same item category
 // (e.g., cherry_log → oak_log, andesite → diorite). These should never
 // be chosen as a "how to craft this" recipe.
 const CONVERSION_RECIPE_TYPES = new Set([
-  'botania:mana_infusion',
   'malum:spirit_transmutation',
   'botania:elven_trade',
+])
+
+// Recipe types where SOME recipes are conversions and others are legitimate
+// crafting progressions. Only penalize when input and output share a namespace
+// (e.g., minecraft:andesite → minecraft:diorite is a conversion, but
+// minecraft:iron_ingot → botania:manasteel_ingot is a progression).
+const MIXED_CONVERSION_RECIPE_TYPES = new Set([
+  'botania:mana_infusion',
 ])
 
 function scoreRecipe(recipe: Recipe): number {
   let score = recipe.inputs.length
 
-  // Penalize storage block uncrafting (1 block → 9 items)
+  // Penalize storage block uncrafting (1 block → 9 items),
+  // but not ingot-to-nugget recipes which are legitimate crafting
+  const outputName = recipe.outputs[0]?.item.split(':')[1] ?? ''
   if (
     recipe.inputs.length === 1 &&
     recipe.outputs.length === 1 &&
     recipe.outputs[0].count === 9 &&
-    recipe.type === 'minecraft:crafting_shapeless'
+    recipe.type === 'minecraft:crafting_shapeless' &&
+    !outputName.endsWith('_nugget')
   ) {
     score += 100
   }
@@ -28,14 +38,29 @@ function scoreRecipe(recipe: Recipe): number {
     score += 200
   }
 
+  // For mixed recipe types, only penalize same-namespace conversions
+  if (MIXED_CONVERSION_RECIPE_TYPES.has(recipe.type) && recipe.inputs.length === 1) {
+    const inNs = recipe.inputs[0].item.split(':')[0]
+    const outNs = recipe.outputs[0]?.item.split(':')[0]
+    if (inNs === outNs) {
+      score += 200
+    }
+  }
+
   // Penalize 1-to-1 recipes where input and output share the same base name
-  // (e.g., cherry_log → oak_log, both are *_log)
+  // and namespace (e.g., minecraft:cherry_log → minecraft:oak_log, both are *_log).
+  // Cross-namespace recipes (e.g., minecraft:iron_ingot → botania:manasteel_ingot)
+  // are legitimate crafting progressions and should not be penalized.
   if (recipe.inputs.length === 1 && recipe.outputs.length === 1) {
-    const inName = recipe.inputs[0].item.split(':')[1] ?? ''
-    const outName = recipe.outputs[0].item.split(':')[1] ?? ''
+    const inputId = recipe.inputs[0].item
+    const outputId = recipe.outputs[0].item
+    const inNs = inputId.split(':')[0]
+    const outNs = outputId.split(':')[0]
+    const inName = inputId.split(':')[1] ?? ''
+    const outName = outputId.split(':')[1] ?? ''
     const inSuffix = inName.split('_').slice(-1)[0]
     const outSuffix = outName.split('_').slice(-1)[0]
-    if (inSuffix && outSuffix && inSuffix === outSuffix && inName !== outName && !recipe.inputs[0].item.startsWith('#')) {
+    if (inSuffix && outSuffix && inSuffix === outSuffix && inName !== outName && inNs === outNs && !inputId.startsWith('#')) {
       score += 50
     }
   }
