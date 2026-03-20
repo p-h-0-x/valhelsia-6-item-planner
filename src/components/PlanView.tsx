@@ -57,7 +57,7 @@ export function PlanView({ itemId, data, onClose, onItemSelect }: PlanViewProps)
       </div>
 
       <div className="hidden md:block">
-        <Sidebar result={result} data={data} />
+        <Sidebar result={result} data={data} onItemSelect={onItemSelect} />
       </div>
 
       {sidebarOpen && (
@@ -73,7 +73,7 @@ export function PlanView({ itemId, data, onClose, onItemSelect }: PlanViewProps)
               &times;
             </button>
           </div>
-          <Sidebar result={result} data={data} />
+          <Sidebar result={result} data={data} onItemSelect={(id) => { setSidebarOpen(false); onItemSelect(id) }} />
         </div>
       )}
 
