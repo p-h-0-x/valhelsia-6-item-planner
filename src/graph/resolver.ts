@@ -33,6 +33,18 @@ function scoreRecipe(recipe: Recipe): number {
     score += 100
   }
 
+  // Penalize storage packing recipes (9 nuggets → 1 ingot, 9 ingots → 1 block).
+  // These are reconstruction recipes, not real crafting progressions.
+  if (
+    recipe.inputs.length === 1 &&
+    recipe.outputs.length === 1 &&
+    recipe.inputs[0].count === 9 &&
+    recipe.outputs[0].count === 1 &&
+    recipe.type === 'minecraft:crafting_shaped'
+  ) {
+    score += 100
+  }
+
   // Heavily penalize conversion recipes (variant swaps)
   if (CONVERSION_RECIPE_TYPES.has(recipe.type)) {
     score += 200
