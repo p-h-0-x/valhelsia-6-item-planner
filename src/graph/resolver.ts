@@ -17,18 +17,24 @@ const MIXED_CONVERSION_RECIPE_TYPES = new Set([
   'botania:mana_infusion',
 ])
 
+function isNugget(itemName: string): boolean {
+  return itemName.endsWith('_nugget') || itemName.startsWith('nugget_')
+}
+
 function scoreRecipe(recipe: Recipe): number {
   let score = recipe.inputs.length
 
   // Penalize storage block uncrafting (1 block → 9 items),
-  // but not ingot-to-nugget recipes which are legitimate crafting
+  // but not ingot-to-nugget recipes which are legitimate crafting.
+  // Nugget naming varies by mod: minecraft uses `gold_nugget`,
+  // mekanism/IE use `nugget_bronze`, so check both patterns.
   const outputName = recipe.outputs[0]?.item.split(':')[1] ?? ''
   if (
     recipe.inputs.length === 1 &&
     recipe.outputs.length === 1 &&
     recipe.outputs[0].count === 9 &&
     recipe.type === 'minecraft:crafting_shapeless' &&
-    !outputName.endsWith('_nugget')
+    !isNugget(outputName)
   ) {
     score += 100
   }
@@ -43,6 +49,21 @@ function scoreRecipe(recipe: Recipe): number {
     recipe.type === 'minecraft:crafting_shaped'
   ) {
     score += 100
+  }
+
+  // Penalize smelting/blasting recipes that recycle equipment into nuggets
+  // (e.g., bronze_helmet → nugget_bronze). These should never be chosen
+  // over the ingot-to-nugget uncrafting recipe. Exclude legitimate smelting
+  // of raw materials (e.g., raw_nugget_stamp → nugget_stamp).
+  if (
+    (recipe.type === 'minecraft:smelting' || recipe.type === 'minecraft:blasting') &&
+    recipe.outputs.length === 1 &&
+    isNugget(outputName)
+  ) {
+    const inputName = recipe.inputs[0]?.item.split(':')[1] ?? ''
+    if (!inputName.startsWith('raw_')) {
+      score += 100
+    }
   }
 
   // Heavily penalize conversion recipes (variant swaps)
