@@ -26,6 +26,7 @@ export const RECIPE_TYPE_TO_MACHINE: Record<string, string> = {
   'minecraft:smoking': 'minecraft:smoker',
   'minecraft:stonecutting': 'minecraft:stonecutter',
   'minecraft:smithing_transform': 'minecraft:smithing_table',
+  'mekanism:mek_data': 'minecraft:crafting_table',
   'create:pressing': 'create:mechanical_press',
   'create:mixing': 'create:mechanical_mixer',
   'create:crushing': 'create:crushing_wheel',
