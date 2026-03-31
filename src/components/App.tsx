@@ -1,19 +1,50 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { SearchBar } from './SearchBar'
 import { PlanView } from './PlanView'
 import { loadData, type AppData } from '../data/loader'
 import { IconIndexProvider } from '../data/icon-context'
 
+function getItemFromURL(): string | null {
+  const params = new URLSearchParams(window.location.search)
+  return params.get('item') || null
+}
+
 export default function App() {
   const [data, setData] = useState<AppData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [selectedItem, setSelectedItem] = useState<string | null>(null)
+  const [selectedItem, setSelectedItem] = useState<string | null>(() => getItemFromURL())
+  const isInitialMount = useRef(true)
 
   useEffect(() => {
     loadData().then((d) => {
       setData(d)
       setLoading(false)
+      const urlItem = getItemFromURL()
+      if (urlItem && !d.itemMap.has(urlItem)) {
+        setSelectedItem(null)
+        window.history.replaceState(null, '', window.location.pathname)
+      }
     })
+  }, [])
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+    const base = import.meta.env.BASE_URL
+    const url = selectedItem
+      ? `${base}?item=${encodeURIComponent(selectedItem)}`
+      : base
+    window.history.pushState({ item: selectedItem }, '', url)
+  }, [selectedItem])
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setSelectedItem(getItemFromURL())
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
   if (loading || !data) {
