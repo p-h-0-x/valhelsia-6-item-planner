@@ -42,6 +42,7 @@ const RECIPE_TYPE_TO_MACHINE: Record<string, string> = {
   'create:sandpaper_polishing': 'create:sandpaper',
   'create:sequenced_assembly': 'create:sequenced_assembly',
   'create:mechanical_crafting': 'create:mechanical_crafter',
+  'mekanism:mek_data': 'minecraft:crafting_table',
   'mekanism:crushing': 'mekanism:crusher',
   'mekanism:enriching': 'mekanism:enrichment_chamber',
   'mekanism:combining': 'mekanism:combiner',
@@ -293,7 +294,7 @@ function normalizeRecipe(recipeId: string, raw: Record<string, unknown>): Normal
   let outputs: NormalizedIngredient[]
   let pattern: (string | null)[][] | undefined
 
-  if (type === 'minecraft:crafting_shaped') {
+  if (type === 'minecraft:crafting_shaped' || type === 'mekanism:mek_data') {
     inputs = parseShapedIngredients(raw)
     outputs = parseGenericOutputs(raw)
     pattern = parseShapedPattern(raw)
